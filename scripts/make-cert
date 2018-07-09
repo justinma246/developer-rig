@@ -52,7 +52,7 @@ else
 	echo -e '\n\n\n\n\n\n\n' | openssl req -x509 -days 99999 -config $CA -newkey rsa:4096 -sha256 -nodes -out cacert.pem -outform PEM
 	check "create the certificate authority certificate"
 
-	# Create the certificate requests for the rig and localhost.
+	# Create the certificate requests for the Developer Rig and localhost.
 	echo "DNS.1 = localhost.rig.twitch.tv" > rig.dns
 	echo "DNS.1 = localhost" > localhost.dns
 	for i in rig localhost; do
@@ -63,7 +63,7 @@ else
 		mv serverkey.pem ${i}key.pem
 	done
 
-	# Create the server certificates for the rig and localhost.
+	# Create the server certificates for the Developer Rig and localhost.
 	rm $CA
 	cat "$D/$CA" "$D/openssl-ca.add" > $CA
 	echo "unique_subject = no" > index.txt.attr
@@ -72,7 +72,7 @@ else
 		check "create the $i server certificate"
 	done
 
-	# Move all desired files to the rig ssl directory.
+	# Move all desired files to the Developer Rig ssl directory.
 	[ -s cacert.pem -a -s cakey.pem -a -s rigcert.pem -a -s rigkey.pem -a -s localhostcert.pem -a -s localhostkey.pem ] || fail "OpenSSL failed"
 	mv cacert.pem "$SSL/cacert.crt"
 	mv cakey.pem "$SSL/cacert.key"
@@ -80,7 +80,7 @@ else
 	mv rigkey.pem "$SSL/selfsigned.key"
 	mv localhostcert.pem "$SSL/server.crt"
 	mv localhostkey.pem "$SSL/server.key"
-	check "place the developer rig certificates"
+	check "place the Developer Rig certificates"
 fi
 
 # Copy localhost certificates to the extension conf directory.
@@ -121,7 +121,7 @@ if $NEEDS_INSTALLATION; then
 
 	# The user must restart their browser for these changes to take effect.
 	if [ $# -eq 0 ]; then
-		echo -e '\033[1;31mNOTE:\033[0;31m  you must restart your browser before running the developer rig.\033[0m'
+		echo -e '\033[1;31mNOTE:\033[0;31m  you must restart your browser before running the Developer Rig.\033[0m'
 	else
 		echo -e '\033[1;33mNOTE:\033[0;33m  you must restart your browser before continuing.'
 		echo -e 'Press "return" to acknowledge.\033[0m'

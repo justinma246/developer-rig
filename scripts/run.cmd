@@ -68,12 +68,12 @@ IF EXIST "%MANIFEST_FILE%" (
 	)
 )
 
-REM Start new command prompts for the different aspects of running the rig.
+REM Start new command prompts for the different aspects of running the Developer Rig.
 SET NWINDOWS=1
 SET S=
 IF NOT "%FRONTEND_DIRECTORY%" == "" FOR %%I IN ("%FRONTEND_DIRECTORY%") DO SET FRONTEND_DIRECTORY=%%~fI
 IF "%FRONTEND_DIRECTORY%" == "" (
-	ECHO Extension front-end hosting is not being provided by the developer rig.
+	ECHO Extension front-end hosting is not being provided by the Developer Rig.
 ) ELSE (
 	ECHO Hosting extension front-end in "%FRONTEND_DIRECTORY%".
 	SET /A NWINDOWS+=1
@@ -82,7 +82,7 @@ IF "%FRONTEND_DIRECTORY%" == "" (
 )
 IF NOT "%BACKEND_FILE%" == "" FOR %%I IN ("%BACKEND_FILE%") DO SET BACKEND_FILE=%%~fI
 IF "%BACKEND_FILE%" == "" (
-	ECHO Extension back-end service hosting is not being provided by the developer rig.
+	ECHO Extension back-end service hosting is not being provided by the Developer Rig.
 ) ELSE (
 	ECHO Hosting extension back-end service in "%BACKEND_FILE%".
 	SET /A NWINDOWS+=1
@@ -90,7 +90,7 @@ IF "%BACKEND_FILE%" == "" (
 	START "%BACKEND_FILE%" CMD /C CALL "%~dp0new.cmd" node "%BACKEND_FILE%" -l "%MANIFEST_FILE%"
 )
 START "%MANIFEST_FILE%" CMD /C CALL "%~dp0new.cmd" CALL yarn start -l "%MANIFEST_FILE%"
-ECHO Opened %NWINDOWS% other command prompt%S% to run the developer rig.
+ECHO Opened %NWINDOWS% other command prompt%S% to run the Developer Rig.
 EXIT /B
 
 :usage

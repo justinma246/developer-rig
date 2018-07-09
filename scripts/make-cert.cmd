@@ -70,7 +70,7 @@ IF "%NEEDS_INSTALLATION%" == "YES" (
 
 	REM The user must restart their browser for these changes to take effect.
 	IF "%~1" == "" (
-		ECHO NOTE:  you must restart your browser before running the developer rig.
+		ECHO NOTE:  you must restart your browser before running the Developer Rig.
 	) ELSE (
 		ECHO NOTE:  you must restart your browser before continuing.
 	)
@@ -113,7 +113,7 @@ IF ERRORLEVEL 1 (
 	EXIT /B 1
 )
 
-REM Create the certificate requests for the rig and localhost.
+REM Create the certificate requests for the Developer Rig and localhost.
 ECHO DNS.1 = localhost.rig.twitch.tv> rig.dns
 ECHO DNS.1 = localhost> localhost.dns
 FOR %%I IN (rig localhost) DO (
@@ -127,7 +127,7 @@ FOR %%I IN (rig localhost) DO (
 	REN serverkey.pem %%Ikey.pem
 )
 
-REM Create the server certificates for the rig and localhost.
+REM Create the server certificates for the Developer Rig and localhost.
 DEL %CA%
 COPY /B "%D%%CA%"+"%D%openssl-ca.add" %CA%
 ECHO unique_subject = no> index.txt.attr
@@ -139,7 +139,7 @@ FOR %%I IN (rig localhost) DO (
 	)
 )
 
-REM Move all desired files to the rig ssl directory.
+REM Move all desired files to the Developer Rig ssl directory.
 MOVE /Y cacert.pem "%SSL%\cacert.crt" > NUL
 MOVE /Y cakey.pem "%SSL%\cacert.key" > NUL
 MOVE /Y rigcert.pem "%SSL%\selfsigned.crt" > NUL
@@ -147,6 +147,6 @@ MOVE /Y rigkey.pem "%SSL%\selfsigned.key" > NUL
 MOVE /Y localhostcert.pem "%SSL%\server.crt" > NUL
 MOVE /Y localhostkey.pem "%SSL%\server.key" > NUL
 IF ERRORLEVEL 1 (
-	ECHO Cannot place the developer rig certificates.
+	ECHO Cannot place the Developer Rig certificates.
 	EXIT /B 1
 )

@@ -38,10 +38,10 @@
 </ul>
 <h2 id="twitch-extensions-101">Twitch Extensions 101</h2>
 <p>Think of Twitch Extensions as Apps for Twitch. Developers can create sandboxed web applications that run on <a href="https://twitch.tv">Twitch</a> that provide new and different ways for viewers and broadcasters to interact.</p>
-<p>To build the simplest Extension, a developer creates a web application (a collection of assets that include HTML, CSS, and Javascript) and then hosts these assets from the Twitch CDN ext.twitch.tv. A more complicated but more common Extension leverages an Extension Backend Service (EBS). An EBS is a web service written by a developer for managing the state of their Extension. These two blocks of developer written code are often referred to as the <strong>frontend</strong> and the <strong>backend</strong>.</p>
-<p><em>Developers are currently completely responsible for operating their backends.</em></p>
-<p>The <a href="https://dev.twitch.tv">Twitch Developer Site</a> is currently where the lifecycle of an Extension is managed. This includes creation, <em>frontend</em> asset upload, submitting to review, and promoting to be released. The Dev Site is where key pieces of data are retrieved to configure and run the Developer Rig.</p>
-<p>The Developer Rig hosts Extension frontends locally. This gives developers complete flexibility to run and test their Extensions without needing to load Twitch. For example, the Developer Rig does not currently stream video, reducing friction for testing a Video Overlay Extension. Additionally, multiple views of a single Extension can be loaded onto a single page, giving developers a single pane of glass for the different relevant views for their Extension.</p>
+<p>To build the simplest Extension, a developer creates a web application (a collection of assets that include HTML, CSS, and Javascript) and then hosts these assets from the Twitch CDN ext.twitch.tv. A more complicated but more common Extension leverages an Extension Back-end Service (EBS). An EBS is a web service written by a developer for managing the state of their Extension. These two blocks of developer written code are often referred to as the <strong>front-end</strong> and the <strong>back-end</strong>.</p>
+<p><em>Developers are currently completely responsible for operating their back-ends.</em></p>
+<p>The <a href="https://dev.twitch.tv">Twitch Developer Site</a> is currently where the lifecycle of an Extension is managed. This includes creation, <em>front-end</em> asset upload, submitting to review, and promoting to be released. The Dev Site is where key pieces of data are retrieved to configure and run the Developer Rig.</p>
+<p>The Developer Rig hosts Extension front-ends locally. This gives developers complete flexibility to run and test their Extensions without needing to load Twitch. For example, the Developer Rig does not currently stream video, reducing friction for testing a Video Overlay Extension. Additionally, multiple views of a single Extension can be loaded onto a single page, giving developers a single pane of glass for the different relevant views for their Extension.</p>
 <h2 id="motivation">Motivation</h2>
 <p>The Developer Rig is a tool that enables <a href="https://dev.twitch.tv/extensions">Twitch Extensions</a> developers to iterate more quickly and focus on building great Extensions, by providing a single pane of glass for all end user Extensions views and interactions. It is a lightweight web app that runs in a browser and is built using <a href="https://nodejs.org">NodeJS 6+</a> and <a href="https://reactjs.org/">React</a>. The Developer Rig allows Extensions Developers to quickly and easily, locally end-to-end test in development Extensions.</p>
 <h2 id="overview">Overview</h2>
@@ -130,7 +130,7 @@
 <h4 id="configurations">Configurations</h4>
 <p>The section displays manifest data pulled from Twitch for the corresponding Extension Client ID.</p>
 <h4 id="rig-console">Rig Console</h4>
-<p>At the bottom of every page, there is the Developer Rig Console. Extensions are able to output directly to this console by making the following call from their Extension's frontend javascript:</p>
+<p>At the bottom of every page, there is the Developer Rig Console. Extensions are able to output directly to this console by making the following call from their Extension's front-end javascript:</p>
 <pre><code>window.Twitch.ext.rig.log(&lt;message to log&gt;)
 </code></pre>
 <p>Each view is prefixed with the corresponding &quot;user context&quot;, i.e logged in viewer, broadcaster etc. An active video stream is not required to leverage video overlays in the Developer Rig. When an Extension is running in the Developer Rig, developers can interact with it just like an end user.</p>
@@ -141,17 +141,17 @@
 <pre><code class="language-bash"># Usage: yarn extension-init -a [github_account] -r [github_repo] -d [directory]
 yarn extension-init -d &lt;directory&gt;
 </code></pre>
-<p>To have the Developer Rig host the frontend assets of an Extension, use the <code>host</code> command. Assets for the example Extension can be hosted on <code>https://localhost.rig.twitch.tv:8080</code> by issuing the following command:</p>
+<p>To have the Developer Rig host the front-end assets of an Extension, use the <code>host</code> command. Assets for the example Extension can be hosted on <code>https://localhost.rig.twitch.tv:8080</code> by issuing the following command:</p>
 <pre><code class="language-bash"># Usage: yarn host -d &lt;directory&gt; -p [port]
 yarn host -d &lt;directory&gt;/public -p 8080
 </code></pre>
-<p><em>Ensure that the URL that the example Extension's Extension Backend Service (EBS) is running on and the Extension secret, match what is specified in the dev site!</em></p>
+<p><em>Ensure that the URL that the example Extension's Extension Back-end Service (EBS) is running on and the Extension secret, match what is specified in the dev site!</em></p>
 <img src="./docs/asset-hosting.png" width="70%">
 <p>In the above screenshot, assets are specified as being available at:</p>
 <pre><code>https://localhost:8080/viewer.html
 https://localhost:8080/config.html
 </code></pre>
-<p>If the Developer Rig is used to <code>host</code> an Extension's front end assets, the <em>Testing Base URI</em> must be set to:</p>
+<p>If the Developer Rig is used to <code>host</code> an Extension's front-end assets, the <em>Testing Base URI</em> must be set to:</p>
 <pre><code>https://localhost.rig.twitch.tv:[port]
 </code></pre>
 <p>When an Extension has been loaded into the Developer Rig, refreshing your browser window will cause the latest Extension assets to be pulled into the page.</p>
@@ -159,15 +159,15 @@ https://localhost:8080/config.html
 <p>Conceptualizing how an Extension works can be tricky, particularly in the context of the Developer Rig. Three main pieces are needed:</p>
 <ul>
 <li>the Developer Rig service (i.e. <code>yarn start</code>)</li>
-<li>a service hosting the Extension front end and associated assets (i.e. <code>yarn host</code>)</li>
-<li>an Extension Backend Service (EBS)</li>
+<li>a service hosting the Extension front-end and associated assets (i.e. <code>yarn host</code>)</li>
+<li>an Extension Back-end Service (EBS)</li>
 </ul>
-<p>The Developer Rig loads the front end assets into its pages. The front end pages are able to call the EBS (signing requests with the Extension's JWT). An EBS can either respond directly to a front end client, or is able to push messages to all connected front ends via PubSub.</p>
+<p>The Developer Rig loads the front-end assets into its pages. The front-end pages are able to call the EBS (signing requests with the Extension's JWT). An EBS can either respond directly to a front-end client, or is able to push messages to all connected front-ends via PubSub.</p>
 <p>If you are experience difficulties getting things to work:</p>
 <ul>
 <li>ensure that everything is running on HTTPS and accessible in your browser</li>
 <li>ensure that the secret that is loaded into the Developer Rig matches the secret present in your EBS</li>
-<li>if you are struggling to get PubSub to work, assert that your EBS receives and extracts the channel name from the JWT sent by the Extension front end</li>
+<li>if you are struggling to get PubSub to work, assert that your EBS receives and extracts the channel name from the JWT sent by the Extension front-end</li>
 </ul>
 <h2 id="using-local-mode">Using Local Mode</h2>
 <p>Local Mode enables developers to run their extension projects against
@@ -200,24 +200,24 @@ adjustments.</p>
 <li>The type of callback e.g OnContext</li>
 <li>The callback response</li>
 </ol>
-<p>You should refer to the Helper API documentation <a href="https://dev.twitch.tv/docs/extensions/reference/#javascript-helper">here</a> before editing and creating new responses.</p>
+<p>Refer to the Helper API documentation <a href="https://dev.twitch.tv/docs/extensions/reference/#javascript-helper">here</a> before editing and creating new responses.</p>
 <h3 id="providing-a-secret-for-your-ebs-in-local-mode">Providing a Secret for Your EBS in Local Mode</h3>
 <p>When you use Local Mode with your EBS, you'll be using a hard-coded secret in the Rig.  This is also included already in the Hello World example.  When creating an extension on Twitch, you'll have your own client ID and secret.</p>
 <p>The base-64-encoded Local Mode Secret is: <code>kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk</code></p>
 <p>Do <strong>not</strong> expose your EBS beyond your local machine while using the Local Mode secret.  It is purely meant to speed up initial development.</p>
 <h3 id="using-mock-pub-sub">Using Mock Pub Sub</h3>
-<p>When you are in Local Mode, to make calls to Pub Sub, it's important to make sure your EBS is pointing at the correct URI.  You'll want to be making calls to <code>localhost.rig.twitch.tv:3000/extensions/message</code> as opposed to <code>api.twitch.tv/extensions/message</code> in order to correctly send your message.  The rest of your message should be formatted the same as if you were sending to Twitch PubSub.  See the Hello World backend.js files for examples.</p>
+<p>When you are in Local Mode, to make calls to Pub Sub, it's important to make sure your EBS is pointing at the correct URI.  You'll want to be making calls to <code>localhost.rig.twitch.tv:3000/extensions/message</code> as opposed to <code>api.twitch.tv/extensions/message</code> in order to correctly send your message.  Format the rest of your message the same as if you were sending to Twitch PubSub.  See the Hello World <code>backend.js</code> file for examples.</p>
 <h3 id="editing-the-local-extension-manifest">Editing the Local Extension Manifest</h3>
-<p>After you create your local extension manifest, you can open up manifest.json and edit the fields directly.  Most of the fields are not relevant to running your extension locally in the Developer Rig, but you should be aware of a few:</p>
+<p>After you create your local extension manifest, you can open up <code>manifest.json</code> and edit the fields directly.  Most of the fields are not relevant to running your extension locally in the Developer Rig, but you should be aware of a few:</p>
 <ul>
-<li>name: Not critical for Local Mode, but it's always important to give your project a sweet name</li>
-<li>anchor: This should be left blank</li>
-<li>panel_height: This is the height of a panel extension. Default is 300 pixels and must be between 100 and 500 pixels.  For Panel extensions only.</li>
-<li>URLS of various views - When adding a view in the rig, it will look to these for the front end assets.  If you use the Rig host command, be sure to make sure the port and base URI are correct.</li>
-<li>aspect_width: expressed as a % of the screen width and must be &lt; 50%.  30% would show up as 3000.  For Component Extensions only.</li>
-<li>aspect_height: expressed as a % of the screen height from 1% to 100%.  30% would show up as 3000.  For Component Extensions only.</li>
-<li>zoom_pixels: default is 1024.  For Component extensions only.</li>
-<li>zoom: default is true.  For Component Extensions only</li>
+<li><code>name</code>: Not critical for Local Mode, but it's always important to give your project a sweet name</li>
+<li><code>anchor</code>: This should be left blank</li>
+<li><code>panel_height</code>: This is the height of a panel extension. Default is 300 pixels and must be between 100 and 500 pixels.  For Panel extensions only.</li>
+<li>URLS of various views - When adding a view in the rig, it will look to these for the front-end assets.  If you use the Rig <code>host</code> command, be sure to make sure the port and base URI are correct.</li>
+<li><code>aspect_width</code>: expressed as a % of the screen width and must be &lt; 50%.  Note that the manifest file will express 30% as 3000.  For Component Extensions only.</li>
+<li><code>aspect_height</code>: expressed as a % of the screen height from 1% to 100%.  Note that the manifest file will express 30% as 3000.  For Component Extensions only.</li>
+<li><code>zoom_pixels</code>: default is 1024.  For Component extensions only.</li>
+<li><code>zoom</code>: default is <code>true</code>.  For Component Extensions only</li>
 </ul>
 <p>When creating additional manifests, use the <strong>-h</strong> flag to see what additional arguments you can add.</p>
 <h2 id="faqs">FAQs</h2>
@@ -252,7 +252,7 @@ adjustments.</p>
 </blockquote>
 <p><em>I am certain that my Developer Rig Configuration is correct, but my Extension is still not working.</em></p>
 <blockquote>
-<p>Clear your browser cache and local storage, restart the Developer Rig, and cross your fingers. To delete the rig's local storage open the javascript console in your browser on a tab with the rig open and do <code>localStorage.clear();</code> then refresh. Ensure you've included the <a href="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js">Twitch Extension Helper</a> in your front end files.</p>
+<p>Clear your browser cache and local storage, restart the Developer Rig, and cross your fingers. To delete its local storage, use your browser's developer tools to do so then refresh your browser. Ensure you've included the <a href="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js">Twitch Extension Helper</a> in your front-end files.</p>
 </blockquote>
 <p><em>I see an error when attempting to run <code>yarn test</code>.</em></p>
 <blockquote>
@@ -264,7 +264,7 @@ adjustments.</p>
 </blockquote>
 <p><em>I get an error when pulling in the example project!</em></p>
 <blockquote>
-<p>Ensure that Git is in your PATH variables by attempting to run &quot;git&quot; at your commmand line. If that works, also ensure that the local folder does not currently exist.</p>
+<p>Ensure that Git is in your PATH variable by attempting to run &quot;git&quot; at your commmand line. If that works, also ensure that you don't already have the example project folder.</p>
 </blockquote>
 <p><em>The Developer Rig stops running unexpectedly in Local Mode.</em></p>
 <blockquote>

@@ -82,7 +82,7 @@ IF ERRORLEVEL 1 (
 	GOTO done
 )
 
-REM Create CA and rig and localhost SSL certificates.
+REM Create CA and Developer Rig and localhost SSL certificates.
 CALL "%~dp0make-cert.cmd" -
 
 :done

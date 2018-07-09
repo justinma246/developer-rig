@@ -70,22 +70,22 @@ else
 	yarn create-manifest -t panel -o "$MANIFEST_FILE"
 fi
 
-# Start new processes for the different aspects of running the rig.
+# Start new processes for the different aspects of running the Developer Rig.
 NPROCESSES=0
 if [ -z "$FRONTEND_DIRECTORY" ]; then
-	echo "Front-end hosting is not being provided by the developer rig."
+	echo "Front-end hosting is not being provided by the Developer Rig."
 else
 	echo "Hosting front-end in '$FRONTEND_DIRECTORY'."
 	yarn host -d "$FRONTEND_DIRECTORY" -p 8080 -l &
 	NPROCESSES=$(expr $NPROCESSES + 1)
 fi
 if [ -z "$BACKEND_FILE" ]; then
-	echo "Back-end hosting is not being provided by the developer rig."
+	echo "Back-end hosting is not being provided by the Developer Rig."
 else
 	echo "Hosting back-end in '$BACKEND_FILE'."
 	node "$BACKEND_FILE" -l "$MANIFEST_FILE" &
 	NPROCESSES=$(expr $NPROCESSES + 1)
 fi
 [ $NPROCESSES -gt 1 ] && ES=es
-[ $NPROCESSES -gt 0 ] && echo "Started $NPROCESSES other process$ES to run the developer rig."
+[ $NPROCESSES -gt 0 ] && echo "Started $NPROCESSES other process$ES to run the Developer Rig."
 yarn start -l "$MANIFEST_FILE"
