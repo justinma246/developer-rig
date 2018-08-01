@@ -78,7 +78,7 @@ IF "%FRONTEND_DIRECTORY%" == "" (
 	ECHO Hosting extension front-end in "%FRONTEND_DIRECTORY%".
 	SET /A NWINDOWS+=1
 	SET S=s
-	START "%FRONTEND_DIRECTORY%" CMD /C yarn host -d "%FRONTEND_DIRECTORY%" -p 8080 -l
+	START "%FRONTEND_DIRECTORY%" CMD /C CALL "%~dp0new.cmd" CALL yarn host -d "%FRONTEND_DIRECTORY%" -p 8080 -l
 )
 IF NOT "%BACKEND_FILE%" == "" FOR %%I IN ("%BACKEND_FILE%") DO SET BACKEND_FILE=%%~fI
 IF "%BACKEND_FILE%" == "" (
@@ -87,9 +87,9 @@ IF "%BACKEND_FILE%" == "" (
 	ECHO Hosting extension back-end service in "%BACKEND_FILE%".
 	SET /A NWINDOWS+=1
 	SET S=s
-	START "%BACKEND_FILE%" CMD /C node "%BACKEND_FILE%" -l "%MANIFEST_FILE%"
+	START "%BACKEND_FILE%" CMD /C CALL "%~dp0new.cmd" node "%BACKEND_FILE%" -l "%MANIFEST_FILE%"
 )
-START "%MANIFEST_FILE%" CMD /C yarn start -l "%MANIFEST_FILE%"
+START "%MANIFEST_FILE%" CMD /C CALL "%~dp0new.cmd" CALL yarn start -l "%MANIFEST_FILE%"
 ECHO Opened %NWINDOWS% other command prompt%S% to run the developer rig.
 EXIT /B
 
