@@ -19,16 +19,20 @@ SHIFT /1
 GOTO loop
 :end
 
-REM Check for elevation and invoke configuration appropriately.
+REM Check if configuration is required.
 CALL "%~dp0check-configure.cmd"
-IF ERRORLEVEL 1 (
+IF ERRORLEVEL 2 (
 	CALL "%~dp0configure.cmd"
 	IF NOT ERRORLEVEL 1 (
-		ECHO When configuration completes,
-		PAUSE
+		net file > NUL 2> NUL
+		IF ERRORLEVEL 1 (
+			ECHO When configuration completes,
+			PAUSE
+			COPY NUL NUL > NUL
+		)
 	)
-) ELSE (
-	CALL "%~dp0configure.cmd" -
+) ELSE IF ERRORLEVEL 1 (
+	EXIT /B
 )
 IF NOT ERRORLEVEL 1 CALL :path_and_check
 IF ERRORLEVEL 1 (
@@ -51,28 +55,36 @@ IF EXIST "%FRONTEND_DIRECTORY%\public" SET FRONTEND_DIRECTORY=%FRONTEND_DIRECTOR
 
 REM If necessary, create a panel extension manifest file.
 IF "%MANIFEST_FILE%" == "" SET MANIFEST_FILE=%PARENT%\panel.json
+IF NOT "%MANIFEST_FILE%" == "" FOR %%I IN ("%MANIFEST_FILE%") DO SET MANIFEST_FILE=%%~fI
 IF EXIST "%MANIFEST_FILE%" (
 	ECHO Using extension manifest in "%MANIFEST_FILE%".
 ) ELSE (
 	ECHO Creating and using panel extension manifest in "%MANIFEST_FILE%".
-	CMD /C yarn create-manifest -t panel -o "%MANIFEST_FILE%"
+	CALL yarn create-manifest -t panel -o "%MANIFEST_FILE%"
+	IF ERRORLEVEL 1 (
+		ECHO Cannot create manifest file in "%MANIFEST_FILE%".
+		PAUSE
+		EXIT /B
+	)
 )
 
 REM Start new command prompts for the different aspects of running the rig.
 SET NWINDOWS=1
 SET S=
+IF NOT "%FRONTEND_DIRECTORY%" == "" FOR %%I IN ("%FRONTEND_DIRECTORY%") DO SET FRONTEND_DIRECTORY=%%~fI
 IF "%FRONTEND_DIRECTORY%" == "" (
-	ECHO Front-end hosting is not being provided by the developer rig.
+	ECHO Extension front-end hosting is not being provided by the developer rig.
 ) ELSE (
-	ECHO Hosting front-end in "%FRONTEND_DIRECTORY%".
+	ECHO Hosting extension front-end in "%FRONTEND_DIRECTORY%".
 	SET /A NWINDOWS+=1
 	SET S=s
 	START "%FRONTEND_DIRECTORY%" CMD /C yarn host -d "%FRONTEND_DIRECTORY%" -p 8080 -l
 )
+IF NOT "%BACKEND_FILE%" == "" FOR %%I IN ("%BACKEND_FILE%") DO SET BACKEND_FILE=%%~fI
 IF "%BACKEND_FILE%" == "" (
-	ECHO Back-end hosting is not being provided by the developer rig.
+	ECHO Extension back-end service hosting is not being provided by the developer rig.
 ) ELSE (
-	ECHO Hosting back-end in "%BACKEND_FILE%".
+	ECHO Hosting extension back-end service in "%BACKEND_FILE%".
 	SET /A NWINDOWS+=1
 	SET S=s
 	START "%BACKEND_FILE%" CMD /C node "%BACKEND_FILE%" -l "%MANIFEST_FILE%"
@@ -96,6 +108,7 @@ IF EXIST "%~2" (
 	"%~dp0false" 2> NUL
 )
 
+REM If the configure script installed the prerequisites, these are their paths.
 :path_and_check
 PATH %PATH%;%SystemDrive%\Python27;%ProgramFiles%\nodejs;%ProgramFiles(x86)%\Yarn\bin;%ProgramFiles%\Git\cmd
-CALL "%~dp0check-configure.cmd" -
+CALL "%~dp0check-configure.cmd"

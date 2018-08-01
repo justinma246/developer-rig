@@ -4,25 +4,23 @@ SETLOCAL
 REM https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
 REM https://stackoverflow.com/questions/2129713
 
-REM Create the temporary directory.
-SET T=%TEMP%\mkc%RANDOM%
-MD "%T%"
-
 REM Check for elevation.
 CALL "%~dp0check-make-cert.cmd"
+IF NOT ERRORLEVEL 2 EXIT /B
+net file > NUL 2> NUL
 IF ERRORLEVEL 1 (
-	REM Continue installation in an elevated command prompt.
-	ECHO CreateObject^("Shell.Application"^).ShellExecute "cmd.exe", "/c " ^& WScript.Arguments^(0^), "", "runas" > "%T%\elevate.vbs"
 	ECHO Certificate creation will continue in an elevated command prompt.
-	cscript //nologo "%T%\elevate.vbs" "%~f0 %~1"
-	GOTO done
+	cscript //nologo "%~dp0elevate.vbs" "%~f0 %~1"
+	EXIT /B
 ) ELSE IF "%~1" == "" (
 	SET PAUSE=PAUSE
 ) ELSE (
 	SET PAUSE=
 )
 
-REM Switch to the temporary directory.
+REM Create and switch to the temporary directory.
+SET T=%TEMP%\mkc%RANDOM%
+MD "%T%"
 SET D=%~dp0
 CD /D %T%
 
@@ -42,7 +40,7 @@ IF "%HAS_ALL_FILES%" == "YES" (
 ) ELSE (
 	REM Create the certificates.
 	CALL :create
-	IF ERRORLEVEL 1 EXIT /B
+	IF ERRORLEVEL 1 GOTO done
 )
 
 REM Copy localhost certificates to the extension conf directory.
@@ -56,6 +54,7 @@ IF ERRORLEVEL 1 (
 
 REM Import the CA certificate into the local machine's root certificate store.
 SET FF=%ProgramFiles%\Mozilla Firefox\defaults\pref
+IF NOT EXIST "%FF%" SET FF=%ProgramFiles(x86)%\Mozilla Firefox\defaults\pref
 IF "%NEEDS_INSTALLATION%" == "YES" (
 	ECHO Import-Certificate -Filepath "%SSL%\cacert.crt" -CertStoreLocation Cert:\LocalMachine\Root > import.ps1
 	powershell -File import.ps1
