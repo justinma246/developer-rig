@@ -275,7 +275,6 @@ _Are the Extensions Actions supported?_
 
 > Extensions Actions will be added shortly to the Developer Rig.
 
-
 _XXX in the Developer Rig sucks! The Developer Rig is missing feature YYY!_
 
 > Neither of these are questions :) . Raise a PR with proposed changes, and let's help each other!
@@ -318,3 +317,7 @@ _I get an error when pulling in the example project!_
 _The Developer Rig stops running unexpectedly in Local Mode._
 
 > Try deleting the `node_modules` directory and rerunning `yarn install`.
+
+_I recently updated Windows and now the scripts don't run._
+
+> Turn on "Developer mode" in the "For developers" settings.  (Press Windows-X and select "Settings".  "For developers" is under "Update &amp; security".)  Also, ensure the last checkbox on that page (the one for PowerShell script execution policy) is checked.
