@@ -11,7 +11,7 @@ getfullpath() {
 	python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' "$1"
 }
 fail() {
-	echo "$1"
+	echo -e "\033[0;31m$1\033[0m"
 	exit 1
 }
 cannot() {
@@ -19,49 +19,42 @@ cannot() {
 }
 usage() {
 	echo "usage: $0 [-m manifest-file] [-f front-end-directory] [-b back-end-file]"
-	exit 2
+	[ "$1" = "-h" -o "$1" = "--help" ] && exit 0 || exit 2
 }
 
 # Run the configuration script first.
-$(dirname $0)/configure - || exit 1
+D=$(dirname "$0")
+"$D/configure" - || exit 1
 
 # Collect command line parameters or provide defaults.
-D=$(getfullpath $(dirname $0)/..)
+D=$(getfullpath "$D"/..)
 P=$(getfullpath "$D"/..)
-
 if [ $# -eq 0 ]; then
 	MANIFEST_FILE="$P/panel.json"
 	FRONTEND_DIRECTORY="$P/my-extension"
 	BACKEND_FILE="$P/my-extension/services/backend.js"
 else
-	ARGS=`getopt b:f:m:h $*`
-	[ $? -eq 0 ] || usage
-	set -- $ARGS
-	for i; do
-		case "$i" in
-		-b)
+	while [ $# -gt 0 ]; do
+		if [ "$1" = "-b" ]; then
 			BACKEND_FILE="$2";
 			[ -s "$BACKEND_FILE" ] || cannot "open back-end file '$BACKEND_FILE'"
 			BACKEND_FILE=$(getfullpath "$2");
-			shift; shift;;
-		-f)
+			shift
+		elif [ "$1" = "-f" ]; then
 			FRONTEND_DIRECTORY="$2";
 			[ -d "$FRONTEND_DIRECTORY" ] || cannot "open front-end directory '$FRONTEND_DIRECTORY'"
 			FRONTEND_DIRECTORY=$(getfullpath "$2");
-			shift; shift;;
-		-m)
+			shift
+		elif [ "$1" = "-m" ]; then
 			MANIFEST_FILE="$2";
 			[ -s "$MANIFEST_FILE" ] || cannot "open manifest file '$MANIFEST_FILE'"
 			MANIFEST_FILE=$(getfullpath "$2");
-			shift; shift;;
-		-h)
-			usage;;
-		--)
-			shift;
-			break;;
-		esac
+			shift
+		else
+			usage "$1"
+		fi
+		shift
 	done
-	[ $# -eq 0 ] || usage
 fi
 
 # For the "hello world" extension, ensure service of the correct directory.
