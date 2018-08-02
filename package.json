@@ -54,7 +54,6 @@
     "react-scripts": "^1.1.4",
     "redux": "^4.0.0",
     "redux-thunk": "2.2.0",
-    "selfsigned": "^1.10.2",
     "shelljs": "^0.8.1",
     "style-loader": "0.19.0",
     "sw-precache-webpack-plugin": "0.11.4",
@@ -74,12 +73,11 @@
   },
   "scripts": {
     "create-manifest": "node scripts/create-manifest.js",
-    "start": "node ./scripts/ssl.js && cross-env HOST=localhost.rig.twitch.tv HTTPS=true node scripts/start.js",
+    "start": "cross-env HOST=localhost.rig.twitch.tv HTTPS=true node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "extension-init": "node ./scripts/extension-init.js",
-    "ssl": "node ./scripts/ssl.js",
-    "host": "node ./scripts/ssl.js && node ./scripts/host.js"
+    "host": "node ./scripts/host.js"
   },
   "devDependencies": {
     "@types/eventemitter2": "^4.1.0",
