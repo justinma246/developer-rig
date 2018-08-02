@@ -108,8 +108,22 @@ export class ExtensionViewComponent extends React.Component<Props, State> {
           orientation={this.props.orientation}
         />);
         break;
+      case ExtensionAnchor.Overlay:
+        view = (<div
+          className="view nono_zone"
+          style={extensionProps.viewStyles}>
+          <ExtensionFrame
+            bindIframeToParent={this.bindIframeToParent}
+            className="view"
+            frameId={`frameid-${this.props.id}`}
+            extension={this.props.extension}
+            type={this.props.type}
+            mode={this.props.mode}
+          />
+        </div>)
+        break;
       default:
-        // standard view for overlays, panels, live config, and broadcaster config
+        // standard view for panels, live config, and broadcaster config
         view = (<div
           className="view"
           style={extensionProps.viewStyles}>

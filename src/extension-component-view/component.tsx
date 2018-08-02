@@ -56,7 +56,7 @@ export class ExtensionComponentView extends React.Component<Props> {
   public render() {
     return (
       <div
-        className="view component-view"
+        className="view component-view nono_zone"
         style={{
           width: this.props.frameSize.width + 'px',
           height: this.props.frameSize.height + 'px',
