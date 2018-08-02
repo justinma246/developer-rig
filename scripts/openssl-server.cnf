@@ -29,7 +29,7 @@ organizationalUnitName         = Organizational Unit (eg, division)
 organizationalUnitName_default = Twitch Developer Rig
 
 commonName                     = Common Name (e.g. server FQDN or YOUR name)
-commonName_default             = Twitch Developer Rig CA
+commonName_default             = Twitch Developer Rig
 
 emailAddress                   = Email Address
 emailAddress_default           = twitchdev@twitch.tv

@@ -10,20 +10,20 @@ if [ "$(uname)" != "Darwin" ]; then
 fi
 
 # Create the temporary directory.
-D=$(python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' $(dirname $0))
+D=$(python -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' $(dirname "$0"))
 T=$(mktemp -d)
-cd "$T"
+cd $T
 
 # Clean up upon exit.
 on_exit() {
 	cd "$D"
-	rm -rf "$T"
+	rm -rf $T
 }
 trap on_exit EXIT
 
 # Create utility functions.
 fail() {
-	echo "$1"
+	echo -e "\033[0;31m$1\033[0m"
 	exit 1
 }
 check() {
@@ -37,12 +37,9 @@ if [ -s "$SSL/cacert.crt" -a -s "$SSL/cacert.key" -a -s "$SSL/selfsigned.crt" -a
 	# The certificates have been previously created.  Determine if the CA certificate needs installation.
 	security find-certificate -a | grep -Fq "Twitch Developer Rig CA" && NEEDS_INSTALLATION=false
 else
-	# Determine availability of OpenSSL.
+	# Determine the availability of OpenSSL.
 	openssl version > /dev/null 2>&1
-	if [ $? -ne 0 ]; then
-		echo OpenSSL is not available.
-		exit 1
-	fi
+	[ $? -eq 0 ] || fail "OpenSSL is not available."
 
 	# Prepare input files.
 	cp "$D"/*.cnf .
@@ -62,7 +59,7 @@ else
 		rm openssl-server.cnf
 		cat "$D/openssl-server.cnf" $i.dns > openssl-server.cnf
 		echo -e '\n\n\n\n\n\n\n' | openssl req -config openssl-server.cnf -newkey rsa:2048 -sha256 -nodes -out ${i}cert.csr -outform PEM
-		check "create the %%I certificate request"
+		check "create the $i certificate request"
 		mv serverkey.pem ${i}key.pem
 	done
 
@@ -76,12 +73,13 @@ else
 	done
 
 	# Move all desired files to the rig ssl directory.
-	mv cacert.pem "$D/../ssl/cacert.crt"
-	mv cakey.pem "$D/../ssl/cacert.key"
-	mv rigcert.pem "$D/../ssl/selfsigned.crt"
-	mv rigkey.pem "$D/../ssl/selfsigned.key"
-	mv localhostcert.pem "$D/../ssl/server.crt"
-	mv localhostkey.pem "$D/../ssl/server.key"
+	[ -s cacert.pem -a -s cakey.pem -a -s rigcert.pem -a -s rigkey.pem -a -s localhostcert.pem -a -s localhostkey.pem ] || fail "OpenSSL failed"
+	mv cacert.pem "$SSL/cacert.crt"
+	mv cakey.pem "$SSL/cacert.key"
+	mv rigcert.pem "$SSL/selfsigned.crt"
+	mv rigkey.pem "$SSL/selfsigned.key"
+	mv localhostcert.pem "$SSL/server.crt"
+	mv localhostkey.pem "$SSL/server.key"
 	check "place the developer rig certificates"
 fi
 
@@ -93,7 +91,7 @@ check "place the extension server certificates"
 # Import the CA certificate into the local machine's root certificate store.
 if $NEEDS_INSTALLATION; then
 	touch /etc/hosts 2> /dev/null || echo "Please enter your password to install the Twitch Developer Rig certificate."
-	sudo security add-trusted-cert -d -u -1 -k /Library/Keychains/System.keychain "$D/../ssl/cacert.crt"
+	sudo security add-trusted-cert -d -p ssl -u -1 -k /Library/Keychains/System.keychain "$D/../ssl/cacert.crt"
 	check "import the CA certificate into the local machine's root certificate store"
 
 	# If Firefox is installed, allow it to use the certificates in the local
@@ -103,11 +101,12 @@ if $NEEDS_INSTALLATION; then
 		echo 'pref("security.enterprise_roots.enabled", true);' > $FF/defaults/pref/twitch-developer-rig.js
 
 		# Due to Mozilla bug 1300420, the preference specified above isn't
-		# sufficient to trust the certificates.  The following will add the root CA
-		# certificate to Firefox's trust store.
+		# sufficient to trust the certificates.  The following will add the root
+		# CA certificate to Firefox's trust store.
 		# https://github.com/soberhofer/Firefox-RootCA
 		CFG=$FF/mozilla.cfg
-		cat >> $CFG <<- EOF
+		sed '/Twitch Developer Rig CA certificate addition/,$d' $CFG > cfg
+		cat >> cfg <<- EOF
 			// Twitch Developer Rig CA certificate addition
 			var Cc = Components.classes;
 			var Ci = Components.interfaces;
@@ -117,14 +116,15 @@ if $NEEDS_INSTALLATION; then
 			"";
 			certdb.addCertFromBase64(twitchCert, "C,C,C", "");
 		EOF
+		mv cfg $CFG
 	fi
 
 	# The user must restart their browser for these changes to take effect.
 	if [ $# -eq 0 ]; then
-		echo -e '\033[1;33mNOTE:\033[0;33m  you must restart your browser before running the developer rig.\033[0m'
+		echo -e '\033[1;31mNOTE:\033[0;31m  you must restart your browser before running the developer rig.\033[0m'
 	else
-		echo -e '\033[1;33mNOTE:\033[0;33m  you must restart your browser before continuing.\033[0m'
+		echo -e '\033[1;33mNOTE:\033[0;33m  you must restart your browser before continuing.'
+		echo -e 'Press "return" to acknowledge.\033[0m'
+		read L
 	fi
-	echo 'Press "return" to acknowledge.'
-	read L
 fi
