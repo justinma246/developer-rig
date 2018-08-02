@@ -2,7 +2,7 @@
 SETLOCAL
 
 REM https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
-REM https://stackoverflow.com/questions/2129713
+REM https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority
 
 REM Check for elevation.
 CALL "%~dp0check-make-cert.cmd"
