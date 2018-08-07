@@ -15,7 +15,7 @@ trap on_exit EXIT
 
 # Create utility functions.
 fail() {
-	echo "$1"
+	echo -e "\033[0;31m$1\033[0m"
 	exit 1
 }
 check() {
@@ -44,10 +44,24 @@ if ! node --version > /dev/null 2>&1; then
 	check "download Node"
 	sudo installer -pkg "$PKG" -target /
 	check "install Node"
+else
+	V=$(node --version | sed -e 's/v//' -e 's/\..*//')
+	if [ $V -lt 6 ]; then
+		echo -e "\033[0;31mYour current version of node is less than 6.  Before re-running this script,"
+		echo "you must either uninstall the current version or, if you already have a later"
+		echo "version installed, ensure it is earlier in your path so this and other"
+		echo -e "Developer Rig scripts will use it.\033[0m"
+		exit 1
+	fi
 fi
 
 # Download and install Yarn, if necessary.
 if ! yarn --version > /dev/null 2>&1; then
+	touch ~/.profile
+	rm -rf ~/.yarn
 	curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --rc
 	check "install Yarn"
+	echo -e "\033[1;32mNOTE:\033[0;32m  A fresh installation of Yarn requires a new terminal window.  Please run"
+	echo -e "the script again in a new terminal window\033[0m."
+	exit 1
 fi

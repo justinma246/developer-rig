@@ -7,11 +7,12 @@ if [ "$(uname)" != "Darwin" ]; then
 fi
 
 # Run the installation script first.
-$(dirname $0)/install || exit 1
+D=$(dirname "$0")
+"$D/install" || exit 1
 
 # Create utility functions.
 fail() {
-	echo "$1"
+	echo -e "\033[0;31m$1\033[0m"
 	exit 1
 }
 cannot() {
@@ -19,8 +20,8 @@ cannot() {
 }
 
 # Install dependencies.
-cd $(dirname $0)/..
-[ -d node_modules ] || yarn install || cannot "install developer rig dependencies"
+cd "$D/.."
+[ -d node_modules ] || yarn install || cannot "install Developer Rig dependencies"
 
 # Clone and configure the "Hello World" extension from GitHub.
 [ $# -eq 0 ] && WANTS_NPM_INSTALL=false || WANTS_NPM_INSTALL=true
@@ -53,5 +54,5 @@ popd
 grep -Fq localhost.rig.twitch.tv /etc/hosts || echo '127.0.0.1 localhost.rig.twitch.tv' | sudo tee -a /etc/hosts
 cannot 'update /etc/hosts.  Please add "127.0.0.1 localhost.rig.twitch.tv" to /etc/hosts manually before running this script again'
 
-# Create CA and rig and localhost SSL certificates.
-./scripts/make-cert
+# Create CA and Developer Rig and localhost SSL certificates.
+./scripts/make-cert -

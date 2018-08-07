@@ -1,18 +1,14 @@
 @ECHO OFF
 SETLOCAL
 
-REM Create the temporary directory.
-SET T=%TEMP%\cnf%RANDOM%
-MD "%T%"
-
-REM Check for elevation.
+REM Check for configuration.
 CALL "%~dp0check-configure.cmd"
+IF NOT ERRORLEVEL 2 EXIT /B
+net file > NUL 2> NUL
 IF ERRORLEVEL 1 (
-	REM Continue configuration in an elevated command prompt.
-	ECHO CreateObject^("Shell.Application"^).ShellExecute "cmd.exe", "/c " ^& WScript.Arguments^(0^), "", "runas" > "%T%\elevate.vbs"
-	ECHO Installation will continue in an elevated command prompt.
-	cscript //nologo "%T%\elevate.vbs" "%~f0 %~1"
-	GOTO done
+	ECHO Configuration will continue in an elevated command prompt.
+	cscript //nologo "%~dp0elevate.vbs" "%~f0 %~1"
+	EXIT /B
 ) ELSE IF "%~1" == "" (
 	SET PAUSE=PAUSE
 ) ELSE (
@@ -23,13 +19,13 @@ REM Run the installation script first.
 CALL "%~dp0install.cmd" -
 IF ERRORLEVEL 1 GOTO done
 
-REM Install dependencies.
+REM Install run-time dependencies.
 CD /D "%~dp0.."
 PATH %PATH%;%SystemDrive%\Python27;%ProgramFiles%\nodejs;%ProgramFiles(x86)%\Yarn\bin;%ProgramFiles%\Git\cmd
 IF NOT EXIST node_modules (
 	CMD /C yarn install
 	IF ERRORLEVEL 1 (
-		ECHO Cannot install developer rig dependencies.
+		ECHO Cannot install Developer Rig run-time dependencies.
 		GOTO done
 	)
 )
@@ -68,7 +64,7 @@ PUSHD %MY%
 IF "%WANTS_NPM_INSTALL%" == "YES" (
 	CMD /C npm install
 	IF ERRORLEVEL 1 (
-		ECHO Cannot install "Hello World" extension dependencies.
+		ECHO Cannot install "Hello World" extension run-time dependencies.
 		GOTO done
 	)
 )
@@ -86,11 +82,8 @@ IF ERRORLEVEL 1 (
 	GOTO done
 )
 
-REM Create CA and rig and localhost SSL certificates.
+REM Create CA and Developer Rig and localhost SSL certificates.
 CALL "%~dp0make-cert.cmd" -
 
 :done
-SET EXIT_CODE=%ERRORLEVEL%
-IF NOT %EXIT_CODE% == 0 %PAUSE% TYPE NUL
-RD /Q /S %T%
-EXIT /B %EXIT_CODE%
+IF ERRORLEVEL 1 %PAUSE% TYPE NUL

@@ -2,27 +2,25 @@
 SETLOCAL
 
 REM https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
-REM https://stackoverflow.com/questions/2129713
-
-REM Create the temporary directory.
-SET T=%TEMP%\mkc%RANDOM%
-MD "%T%"
+REM https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority
 
 REM Check for elevation.
 CALL "%~dp0check-make-cert.cmd"
+IF NOT ERRORLEVEL 2 EXIT /B
+net file > NUL 2> NUL
 IF ERRORLEVEL 1 (
-	REM Continue installation in an elevated command prompt.
-	ECHO CreateObject^("Shell.Application"^).ShellExecute "cmd.exe", "/c " ^& WScript.Arguments^(0^), "", "runas" > "%T%\elevate.vbs"
 	ECHO Certificate creation will continue in an elevated command prompt.
-	cscript //nologo "%T%\elevate.vbs" "%~f0 %~1"
-	GOTO done
+	cscript //nologo "%~dp0elevate.vbs" "%~f0 %~1"
+	EXIT /B
 ) ELSE IF "%~1" == "" (
 	SET PAUSE=PAUSE
 ) ELSE (
 	SET PAUSE=
 )
 
-REM Switch to the temporary directory.
+REM Create and switch to the temporary directory.
+SET T=%TEMP%\mkc%RANDOM%
+MD "%T%"
 SET D=%~dp0
 CD /D %T%
 
@@ -42,7 +40,7 @@ IF "%HAS_ALL_FILES%" == "YES" (
 ) ELSE (
 	REM Create the certificates.
 	CALL :create
-	IF ERRORLEVEL 1 EXIT /B
+	IF ERRORLEVEL 1 GOTO done
 )
 
 REM Copy localhost certificates to the extension conf directory.
@@ -56,6 +54,7 @@ IF ERRORLEVEL 1 (
 
 REM Import the CA certificate into the local machine's root certificate store.
 SET FF=%ProgramFiles%\Mozilla Firefox\defaults\pref
+IF NOT EXIST "%FF%" SET FF=%ProgramFiles(x86)%\Mozilla Firefox\defaults\pref
 IF "%NEEDS_INSTALLATION%" == "YES" (
 	ECHO Import-Certificate -Filepath "%SSL%\cacert.crt" -CertStoreLocation Cert:\LocalMachine\Root > import.ps1
 	powershell -File import.ps1
@@ -71,7 +70,7 @@ IF "%NEEDS_INSTALLATION%" == "YES" (
 
 	REM The user must restart their browser for these changes to take effect.
 	IF "%~1" == "" (
-		ECHO NOTE:  you must restart your browser before running the developer rig.
+		ECHO NOTE:  you must restart your browser before running the Developer Rig.
 	) ELSE (
 		ECHO NOTE:  you must restart your browser before continuing.
 	)
@@ -114,7 +113,7 @@ IF ERRORLEVEL 1 (
 	EXIT /B 1
 )
 
-REM Create the certificate requests for the rig and localhost.
+REM Create the certificate requests for the Developer Rig and localhost.
 ECHO DNS.1 = localhost.rig.twitch.tv> rig.dns
 ECHO DNS.1 = localhost> localhost.dns
 FOR %%I IN (rig localhost) DO (
@@ -128,7 +127,7 @@ FOR %%I IN (rig localhost) DO (
 	REN serverkey.pem %%Ikey.pem
 )
 
-REM Create the server certificates for the rig and localhost.
+REM Create the server certificates for the Developer Rig and localhost.
 DEL %CA%
 COPY /B "%D%%CA%"+"%D%openssl-ca.add" %CA%
 ECHO unique_subject = no> index.txt.attr
@@ -140,7 +139,7 @@ FOR %%I IN (rig localhost) DO (
 	)
 )
 
-REM Move all desired files to the rig ssl directory.
+REM Move all desired files to the Developer Rig ssl directory.
 MOVE /Y cacert.pem "%SSL%\cacert.crt" > NUL
 MOVE /Y cakey.pem "%SSL%\cacert.key" > NUL
 MOVE /Y rigcert.pem "%SSL%\selfsigned.crt" > NUL
@@ -148,6 +147,6 @@ MOVE /Y rigkey.pem "%SSL%\selfsigned.key" > NUL
 MOVE /Y localhostcert.pem "%SSL%\server.crt" > NUL
 MOVE /Y localhostkey.pem "%SSL%\server.key" > NUL
 IF ERRORLEVEL 1 (
-	ECHO Cannot place the developer rig certificates.
+	ECHO Cannot place the Developer Rig certificates.
 	EXIT /B 1
 )

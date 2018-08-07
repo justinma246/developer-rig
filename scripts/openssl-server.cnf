@@ -1,5 +1,5 @@
 # https://stackoverflow.com/questions/10175812/how-to-create-a-self-signed-certificate-with-openssl
-# https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority/21340898
+# https://stackoverflow.com/questions/21297139/how-do-you-sign-a-certificate-signing-request-with-your-certification-authority
 HOME     = .
 RANDFILE = $ENV::HOME/.rnd
 
@@ -17,7 +17,7 @@ countryName                    = Country Name (2 letter code)
 countryName_default            = US
 
 stateOrProvinceName            = State or Province Name (full name)
-stateOrProvinceName_default    = CA
+stateOrProvinceName_default    = California
 
 localityName                   = Locality Name (eg, city)
 localityName_default           = San Francisco
@@ -29,7 +29,7 @@ organizationalUnitName         = Organizational Unit (eg, division)
 organizationalUnitName_default = Twitch Developer Rig
 
 commonName                     = Common Name (e.g. server FQDN or YOUR name)
-commonName_default             = Twitch Developer Rig CA
+commonName_default             = Twitch Developer Rig
 
 emailAddress                   = Email Address
 emailAddress_default           = twitchdev@twitch.tv
