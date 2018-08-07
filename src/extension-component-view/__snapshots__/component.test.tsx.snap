@@ -135,7 +135,7 @@ ShallowWrapper {
                 type="component"
         />
 </div>,
-      "className": "view component-view",
+      "className": "view component-view nono_zone",
       "style": Object {
         "height": "600px",
         "width": "800px",
@@ -330,7 +330,7 @@ ShallowWrapper {
                     type="component"
           />
 </div>,
-        "className": "view component-view",
+        "className": "view component-view nono_zone",
         "style": Object {
           "height": "600px",
           "width": "800px",
@@ -606,7 +606,7 @@ ShallowWrapper {
                 type="component"
         />
 </div>,
-      "className": "view component-view",
+      "className": "view component-view nono_zone",
       "style": Object {
         "height": "600px",
         "width": "800px",
@@ -805,7 +805,7 @@ ShallowWrapper {
                     type="component"
           />
 </div>,
-        "className": "view component-view",
+        "className": "view component-view nono_zone",
         "style": Object {
           "height": "600px",
           "width": "800px",

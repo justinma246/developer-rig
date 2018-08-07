@@ -3090,7 +3090,7 @@ ShallowWrapper {
           </div>
 </div>,
         <div
-          className="view"
+          className="view nono_zone"
           style={
                     Object {
                               "height": "1pxpx",
@@ -3332,7 +3332,7 @@ ShallowWrapper {
             mode="viewer"
             type="video_overlay"
 />,
-          "className": "view",
+          "className": "view nono_zone",
           "style": Object {
             "height": "1pxpx",
             "width": "1pxpx",
@@ -3432,7 +3432,7 @@ ShallowWrapper {
             </div>
 </div>,
           <div
-            className="view"
+            className="view nono_zone"
             style={
                         Object {
                                     "height": "1pxpx",
@@ -3674,7 +3674,7 @@ ShallowWrapper {
               mode="viewer"
               type="video_overlay"
 />,
-            "className": "view",
+            "className": "view nono_zone",
             "style": Object {
               "height": "1pxpx",
               "width": "1pxpx",
